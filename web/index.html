@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pub/Sub Chat</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 720px;
+        margin: 2rem auto;
+      }
+      #log {
+        border: 1px solid #ddd;
+        padding: 1rem;
+        height: 320px;
+        overflow: auto;
+      }
+      input,
+      button {
+        padding: 0.5rem;
+        margin: 0.25rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Pub/Sub Chat</h1>
+    <div>
+      <input id="name" placeholder="Your name" />
+      <input id="room" placeholder="Room" value="general" />
+      <button id="connect">Connect</button>
+    </div>
+    <div id="conn" style="display: none">
+      <input id="text" placeholder="Type message..." />
+      <button id="send">Send</button>
+    </div>
+    <div id="log"></div>
+    <script>
+      let ws;
+      const log = (m) => {
+        const el = document.getElementById("log");
+        el.innerHTML += `<div>${m}</div>`;
+        el.scrollTop = el.scrollHeight;
+      };
+      document.getElementById("connect").onclick = () => {
+        const name = document.getElementById("name").value || "anon";
+        const room = document.getElementById("room").value || "general";
+        ws = new WebSocket(
+          `ws://${location.host}/ws?room=${encodeURIComponent(
+            room
+          )}&name=${encodeURIComponent(name)}`
+        );
+        ws.onopen = () => {
+          log("✅ connected");
+          document.getElementById("conn").style.display = "block";
+        };
+        ws.onclose = () => log("❌ disconnected");
+        ws.onmessage = (ev) => log("← " + ev.data);
+      };
+      document.getElementById("send").onclick = () => {
+        const text = document.getElementById("text").value;
+        if (!text) return;
+        const room = document.getElementById("room").value || "general";
+        const name = document.getElementById("name").value || "anon";
+        ws.send(JSON.stringify({ type: "chat", room, sender: name, text }));
+        document.getElementById("text").value = "";
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+APP=pubsub
+PKG=github.com/yourname/pubsub-chat
+
+
+.PHONY: run build tidy test
+
+
+tidy:
+go mod tidy
+
+
+build:
+go build -o bin/$(APP) ./cmd/server
+
+
+run:
+HTTP_ADDR=:8080 go run ./cmd/server
+
+
+test:
+go test ./...

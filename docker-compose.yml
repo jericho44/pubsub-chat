@@ -1,0 +1,8 @@
+version: "3.9"
+services:
+chat:
+build: .
+ports:
+- "8080:8080"
+environment:
+- HTTP_ADDR=:8080
