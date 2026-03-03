@@ -1,8 +1,12 @@
 FROM golang:1.22 as builder
+
 WORKDIR /app
-COPY go.mod .
+
+COPY go.mod go.sum ./
 RUN go mod download
+
 COPY . .
+
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -ldflags "-s -w -X pubsub-chat/pkg/version.Tag=prod" \
     -o /bin/pubsub ./cmd/server
